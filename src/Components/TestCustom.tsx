@@ -48,6 +48,49 @@ export function styledDiv<PropTypes>(
     };
 }
 
+// have another layer of a function to have as generic basically to have an outer element which in this case is a div
+
+export function styled<PropTypes>(
+    strings: TemplateStringsArray,
+    ...values: {
+        (
+            props: PropTypes & {
+                children: React.ReactNode;
+            }
+        ): string;
+    }[]
+) {
+    return function (
+        props: PropTypes & {
+            children: React.ReactNode;
+        }
+    ) {
+        let result = "";
+        for (let i = 0; i < strings.length; i++) {
+            result += strings[i];
+            if (i < values.length) {
+                result += values[i](props);
+            }
+        }
+
+        return (
+            <div>
+                <style>
+                    {`
+                        @scope {
+                            ${result}
+                        }
+                    `}
+                </style>
+                {props.children}
+            </div>
+        );
+    };
+}
+styled.div = {
+    styled: styledDiv
+};
+
 export function CustomWrapper({
     children,
     ...props
