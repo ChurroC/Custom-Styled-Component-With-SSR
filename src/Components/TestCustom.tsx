@@ -48,45 +48,54 @@ export function styledDiv<PropTypes>(
     };
 }
 
-// have another layer of a function to have as generic basically to have an outer element which in this case is a div
+// Use omit to refine the generic custom element type
+export function styled<ElementType extends React.ElementType>(as: ElementType) {
+    // This outer function is to have an option for the user to have an outer element
+    const Component: React.ElementType = as;
 
-export function styled<PropTypes>(
-    strings: TemplateStringsArray,
-    ...values: {
-        (
-            props: PropTypes & {
-                children: React.ReactNode;
-            }
-        ): string;
-    }[]
-) {
-    return function (
-        props: PropTypes & {
-            children: React.ReactNode;
-        }
+    return function <PropTypes>(
+        // This inner function is a tag function to allow them to use string literals
+        // We modify the string literals to access props then we add up all the css
+        strings: TemplateStringsArray,
+        ...values: {
+            (
+                props: PropTypes & {
+                    children: React.ReactNode;
+                }
+            ): string;
+        }[]
     ) {
-        let result = "";
-        for (let i = 0; i < strings.length; i++) {
-            result += strings[i];
-            if (i < values.length) {
-                result += values[i](props);
+        return function (
+            props: PropTypes &
+                React.ComponentPropsWithoutRef<ElementType> & {
+                    children: React.ReactNode;
+                }
+        ) {
+            // This final function is to return the JSX with the css
+            let result = "";
+            for (let i = 0; i < strings.length; i++) {
+                result += strings[i];
+                if (i < values.length) {
+                    result += values[i](props);
+                }
             }
-        }
 
-        return (
-            <div>
-                <style>
-                    {`
-                        @scope {
-                            ${result}
-                        }
-                    `}
-                </style>
-                {props.children}
-            </div>
-        );
+            return (
+                <Component>
+                    <style>
+                        {`
+                            @scope {
+                                ${result}
+                            }
+                        `}
+                    </style>
+                    {props.children}
+                </Component>
+            );
+        };
     };
 }
+
 styled.div = {
     styled: styledDiv
 };
