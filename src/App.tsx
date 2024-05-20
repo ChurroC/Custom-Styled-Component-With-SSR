@@ -1,7 +1,7 @@
-import { CustomWrapper, styledDiv, styled } from "./Components/TestCustom";
+import { styled } from "./Components/TestCustom";
 import { StyledWrapper } from "./Components/TestStyled";
 
-const CustomDiv = styledDiv<{
+const CustomDiv = styled.div<{
     backgroundColor?: string;
 }>`
     :scope {
@@ -39,13 +39,6 @@ function App() {
                 <button>Pink</button>
                 <button>System</button>
             </StyledWrapper>
-            <CustomWrapper backgroundColor="red">
-                <div>Theme: Blah Blah Blah</div>
-                <button>Dark</button>
-                <button>Light</button>
-                <button>Pink</button>
-                <button>System</button>
-            </CustomWrapper>
             <CustomDiv backgroundColor="blue">
                 <div>Theme: Blah Blah Blah</div>
                 <button>Dark</button>
