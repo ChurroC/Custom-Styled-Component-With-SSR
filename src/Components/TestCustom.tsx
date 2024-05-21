@@ -65,6 +65,19 @@ export function styled<ElementType extends React.ElementType>(as: ElementType) {
                 }
             }
 
+            let scope = ":scope {";
+            result.match(/(?<=}).*?(?={)/gis).forEach(item => {
+                console.log(item);
+                `${item}{`.split("\n").forEach(line => {
+                    if (line.includes(":") && !line.includes("{")) {
+                        console.log("wow");
+                        console.log(line);
+                        scope += ` ${line}\n`;
+                    }
+                });
+            });
+            scope = scope === ":scope {" ? "" : scope + "}";
+
             Component = as || Component;
 
             return (

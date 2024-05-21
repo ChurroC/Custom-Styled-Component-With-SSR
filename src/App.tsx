@@ -26,14 +26,14 @@ const Thing = styled.div.attrs((/* props */) => ({ tabIndex: 0 }))`
 `;
 
 const ThingCustom = styledCustom.div`
-    :scope{
-        color: blue; //works
-    }
+    color: blue; //works
 
     :scope:hover {
         color: red; //works
     }
 
+    background: red
+    
     :scope ~ :scope {
         background: tomato; // Doesn't work because every div has its own scope
     }
