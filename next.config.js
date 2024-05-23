@@ -4,6 +4,10 @@
  */
 
 /** @type {import("next").NextConfig} */
-const config = {};
+const config = {
+  compiler: {
+    styledComponents: true
+  }
+};
 
 export default config;

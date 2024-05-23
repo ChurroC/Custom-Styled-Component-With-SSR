@@ -34,9 +34,7 @@ export function styled<ElementType extends React.ElementType>(as: ElementType) {
         // This inner function is a tag function to allow them to use string literals
         // We modify the string literals to access props then we add up all the css
         strings: TemplateStringsArray,
-        ...values: {
-            (props: PropTypes): string;
-        }[]
+        ...values: ((props: PropTypes) => string)[]
     ) {
         // All components will have the same unique class name
         const elementClassName =
@@ -64,24 +62,39 @@ export function styled<ElementType extends React.ElementType>(as: ElementType) {
                 if (i < values.length) {
                     // Problem is that we allow not only the custom generic props but also the children and the element props.
                     // Code still works since we are just using a property of the object
-                    result += values[i](props as PropTypes);
+                    result += values?.[i]?.(props as PropTypes);
                 }
             }
 
-            Component = as || Component;
+            Component = as ?? Component;
 
             // This is to add the styles to the first element
-            const styles = firstElement ? (
-                <style>
-                    {serialize(
-                        compile(`.${elementClassName} {
+            let styles: JSX.Element | null = null;
+            if (process.env.NODE_ENV === "production") {
+                if (firstElement) {
+                    styles = (
+                        <style>
+                            {serialize(
+                                compile(`.${elementClassName} {
                                 ${result}
                             }`),
-                        middleware([stringify, namespace])
-                    )}
-                </style>
-            ) : null;
-            console.log(styles);
+                                middleware([stringify, namespace])
+                            )}
+                        </style>
+                    );
+                }
+            } else {
+                styles = (
+                    <style>
+                        {serialize(
+                            compile(`.${elementClassName} {
+                            ${result}
+                        }`),
+                            middleware([stringify, namespace])
+                        )}
+                    </style>
+                );
+            }
 
             firstElement = false;
 
