@@ -1,7 +1,7 @@
 import { styled as styledCustom } from "./Components/TestCustom";
 import styled from "styled-components";
 
-const Thing = styled.div.attrs((/* props */) => ({ tabIndex: 0 }))`
+const Thing = styled.div`
     color: blue;
 
     &:hover {
@@ -26,28 +26,26 @@ const Thing = styled.div.attrs((/* props */) => ({ tabIndex: 0 }))`
 `;
 
 const ThingCustom = styledCustom.div`
-    color: blue; //works
+    color: blue;
 
-    :scope:hover {
-        color: red; //works
+    &:hover {
+        color: red; // <Thing> when hovered
     }
 
-    background: red
-    
-    :scope ~ :scope {
-        background: tomato; // Doesn't work because every div has its own scope
+    & ~ & {
+        background: tomato; // <Thing> as a sibling of <Thing>, but maybe not directly next to it
     }
 
-    :scope + :scope {
-        background: lime; 
+    & + & {
+        background: lime; // <Thing> next to <Thing>
     }
 
-    :scope.something {
-        background: orange; //works
+    &.something {
+        background: orange; // <Thing> tagged with an additional CSS class ".something"
     }
 
-    .something-else :scope {
-        border: 1px solid; //works
+    .something-else & {
+        border: 1px solid; // <Thing> inside another element labeled ".something-else"
     }
 `;
 

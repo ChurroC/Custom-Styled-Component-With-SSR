@@ -1,13 +1,4 @@
-// Goal
-// const StyledWrapper = styled.div<{ backgroundColor?: string }>`
-//     display: flex;
-//     height: 50vh;
-//     flex-direction: column;
-//     align-items: center;
-//     justify-content: center;
-//     gap: 0.75rem;
-//     background-color: ${props => props.backgroundColor || "white"};
-// `;
+import { compile, middleware, namespace, serialize, stringify } from "stylis";
 
 type AsProp<ElementType extends React.ElementType> = {
     as?: ElementType;
@@ -47,13 +38,25 @@ export function styled<ElementType extends React.ElementType>(as: ElementType) {
             (props: PropTypes): string;
         }[]
     ) {
+        // All components will have the same unique class name
+        const elementClassName =
+            Date.now().toString(36) + Math.random().toString(36).substring(2);
+
+        let firstElement = true;
+
+        // maybe have a counter to only have the styles on the first element
+
         const Element = function <
             EscapeHatchElementType extends React.ElementType = ElementType
         >({
             as,
             children,
+            className,
             ...props
-        }: PolymorphicComponentPropWithRef<EscapeHatchElementType, PropTypes>) {
+        }: PolymorphicComponentPropWithRef<
+            EscapeHatchElementType,
+            PropTypes & { className?: string }
+        >) {
             // This final function is to return the JSX with the css
             let result = "";
             for (let i = 0; i < strings.length; i++) {
@@ -65,30 +68,31 @@ export function styled<ElementType extends React.ElementType>(as: ElementType) {
                 }
             }
 
-            let scope = ":scope {";
-            result.match(/(?<=}).*?(?={)/gis).forEach(item => {
-                console.log(item);
-                `${item}{`.split("\n").forEach(line => {
-                    if (line.includes(":") && !line.includes("{")) {
-                        console.log("wow");
-                        console.log(line);
-                        scope += ` ${line}\n`;
-                    }
-                });
-            });
-            scope = scope === ":scope {" ? "" : scope + "}";
-
             Component = as || Component;
 
-            return (
-                <Component {...props}>
-                    <style>
-                        {`
-                            @scope {
+            // This is to add the styles to the first element
+            const styles = firstElement ? (
+                <style>
+                    {serialize(
+                        compile(`.${elementClassName} {
                                 ${result}
-                            }
-                        `}
-                    </style>
+                            }`),
+                        middleware([stringify, namespace])
+                    )}
+                </style>
+            ) : null;
+            console.log(styles);
+
+            firstElement = false;
+
+            return (
+                <Component
+                    className={` ${
+                        className ? className : ""
+                    } ${elementClassName}`}
+                    {...props}
+                >
+                    {styles}
                     {children}
                 </Component>
             );
@@ -278,15 +282,3 @@ styled.textPath = styled("textPath");
 styled.tspan = styled("tspan");
 styled.use = styled("use");
 styled.view = styled("view");
-
-// var arr = string.split("\n");
-
-// for (var i = 0; i < arr.length; i++) {
-//     if (arr[i].trim() !== "") {
-//         console.log(
-//             `"${arr[i].split(":")[0]}": styled("${arr[i]
-//                 .split(":")[0]
-//                 .trim()}"),`
-//         );
-//     }
-// }
