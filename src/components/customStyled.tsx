@@ -40,9 +40,20 @@ export function styled<ElementType extends React.ElementType>(as: ElementType) {
         const elementClassName =
             Date.now().toString(36) + Math.random().toString(36).substring(2);
 
-        let firstElement = true;
-
-        // maybe have a counter to only have the styles on the first element
+        let styles: JSX.Element | null = null;
+        if (values.length === 0) {
+            styles = (
+                <style>
+                    {serialize(
+                        compile(`.${elementClassName} {
+                            ${strings.join("")}
+                        }`),
+                        middleware([stringify, namespace])
+                    )}
+                </style>
+            );
+        }
+        // Compute here so all elements will be the same and won't have to recompute data
 
         const Element = function <
             EscapeHatchElementType extends React.ElementType = ElementType
@@ -55,64 +66,51 @@ export function styled<ElementType extends React.ElementType>(as: ElementType) {
             EscapeHatchElementType,
             PropTypes & { className?: string }
         >) {
-            // This final function is to return the JSX with the css
-            let result = "";
-            for (let i = 0; i < strings.length; i++) {
-                result += strings[i];
-                if (i < values.length) {
-                    // Problem is that we allow not only the custom generic props but also the children and the element props.
-                    // Code still works since we are just using a property of the object
-                    result += values?.[i]?.(props as PropTypes);
+            // There has to be a way to turn everything into a string but still allow props to be accessed so we could only use css processor once
+            if (typeof styles === "undefined") {
+                // This final function is to return the JSX with the css
+                let result = "";
+                for (let i = 0; i < strings.length; i++) {
+                    result += strings[i];
+                    if (i < values.length) {
+                        // Problem is that we allow not only the custom generic props but also the children and the element props.
+                        // Code still works since we are just using a property of the object
+                        result += values?.[i]?.(props as PropTypes);
+                    }
                 }
-            }
-
-            Component = as ?? Component;
-
-            // This is to add the styles to the first element
-            let styles: JSX.Element | null = null;
-            if (process.env.NODE_ENV === "production") {
-                if (firstElement) {
-                    styles = (
-                        <style>
-                            {serialize(
-                                compile(`.${elementClassName} {
-                                ${result}
-                            }`),
-                                middleware([stringify, namespace])
-                            )}
-                        </style>
-                    );
-                }
-            } else {
                 styles = (
                     <style>
                         {serialize(
                             compile(`.${elementClassName} {
-                            ${result}
-                        }`),
+                    ${result}
+                }`),
                             middleware([stringify, namespace])
                         )}
                     </style>
                 );
             }
 
-            firstElement = false;
+            Component = as ?? Component;
 
             return (
-                <Component
-                    className={` ${
-                        className ? className : ""
-                    } ${elementClassName}`}
-                    {...props}
-                >
-                    {styles}
-                    {children}
-                </Component>
+                <>
+                    <Component
+                        className={`${
+                            className ? className + " " : ""
+                        }${elementClassName}`}
+                        {...props}
+                    >
+                        {styles}
+                        {children}
+                    </Component>
+                </>
             );
         };
         // Add the element attr
         // https://stackoverflow.com/questions/56378786/what-is-the-use-case-of-styled-components-attrs-function
-        Element.attr = function () {};
+        Element.attr = function () {
+            return Element;
+        };
         return Element;
     };
 }
