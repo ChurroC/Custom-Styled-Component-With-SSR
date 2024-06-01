@@ -1,0 +1,12 @@
+{
+  "extends": "@repo/typescript-config/base.json",
+  "include": [
+    "./.next/types/**/*.ts",
+    "./next-env.d.ts",
+    "./**/*.tsx",
+    "./**/*.ts",
+    ".next/types/**/*.ts",
+    "./playwright.config.ts"
+  ],
+  "exclude": ["node_modules"]
+}

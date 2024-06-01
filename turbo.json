@@ -1,0 +1,34 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "pipeline": {
+    "deploy": {
+      "dependsOn": ["lint", "build", "test"],
+      "persistent": true
+    },
+    "start": {
+      "dependsOn": ["build"],
+      "persistent": true
+    },
+    "build": {
+      "inputs": ["$TURBO_DEFAULT$", "!src/tests/**", "!playwright/**"],
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+    },
+    "test": {
+      "inputs": ["$TURBO_DEFAULT$", "!playwright/**"],
+      "env": ["CI", "port"],
+      "dependsOn": ["build"],
+      "outputs": ["playwright/**"]
+    },
+    "showTests": {
+      "dependsOn": ["test"],
+      "persistent": true
+    },
+    "lint": {},
+    "dev": {
+      "cache": false,
+      "persistent": true
+    }
+  },
+  "experimentalUI": true
+}

@@ -1,0 +1,55 @@
+{
+  "name": "sweet-styles",
+  "version": "1.0.0",
+  "type": "module",
+  "author": "churroc",
+  "description": "This is a styled component library that is backwards comaptible and is faster and works in future react server components",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "types": "./dist/types/index.d.ts"
+    }
+  },
+  "scripts": {
+    "prebuild": "rm -rf dist",
+    "build": "rollup -c",
+    "postbuild": "rm -rf ./dist/esm/types ./dist/cjs/types",
+    "publishPKG": "sh publish.sh",
+    "lint": "eslint",
+    "dev": "$npm_execpath run build -- --watch"
+  },
+  "peerDependencies": {
+    "react": ">= 16.8.0",
+    "react-dom": ">= 16.8.0"
+  },
+  "dependencies": {
+    "@types/stylis": "^4.2.6",
+    "stylis": "^4.3.2"
+  },
+  "devDependencies": {
+    "rollup": "^4.13.0",
+    "rollup-plugin-dts": "^6.1.0",
+    "rollup-plugin-peer-deps-external": "^2.2.4",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "@types/react": "^18.3.1",
+    "typescript": "^5.5.0-dev.20240511",
+    "react": "^18.2.0",
+    "next": "^14.2.3",
+    "eslint": "9.2.0",
+    "@repo/eslint-config": "workspace: *",
+    "@repo/typescript-config": "workspace: *"
+  },
+  "homepage": "https://github.com/ChurroC/sweet-styles#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChurroC/sweet-styles.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ChurroC/sweet-styles/issues"
+  },
+  "keywords": []
+}
