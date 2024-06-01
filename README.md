@@ -1,1 +1,1 @@
-./packages/next-server-theme/README.md
+packages/sweet-styles/README.md
