@@ -46,6 +46,21 @@ export default async function HomePage() {
         console.error(e);
     }
 
+    let linaria: Analytics | null = null;
+    try {
+        linaria = JSON.parse(
+            await fs.readFile(
+                path.resolve(
+                    process.cwd(),
+                    "../linaria/analyticsData/analytics.json"
+                ),
+                "utf-8"
+            )
+        ) as Analytics;
+    } catch (e) {
+        console.error(e);
+    }
+
     return (
         <div className="flex h-2/3 w-2/3 max-w-3xl items-center justify-around">
             <div className="flex size-full flex-1 flex-col items-center justify-between">
@@ -105,6 +120,34 @@ export default async function HomePage() {
                         ? new Date(
                               nextStylesAnalytics?.time.value
                           ).toLocaleString()
+                        : "No Data"}
+                </p>
+            </div>
+            <div className="flex size-full flex-1 flex-col items-center justify-between">
+                <p>Linaria</p>
+                {(
+                    [
+                        "TTFB",
+                        "FCP",
+                        "LCP",
+                        "FID",
+                        "CLS",
+                        "INP"
+                    ] as (keyof Analytics)[]
+                ).map(item => {
+                    return (
+                        <Item
+                            object1={linaria}
+                            object2={nextStylesAnalytics}
+                            objectKey={item}
+                            key={item}
+                        />
+                    );
+                })}
+                <p title="Last Updated">
+                    Date:{" "}
+                    {linaria?.time
+                        ? new Date(linaria?.time.value).toLocaleString()
                         : "No Data"}
                 </p>
             </div>
